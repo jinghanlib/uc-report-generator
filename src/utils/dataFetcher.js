@@ -36,7 +36,6 @@ export const getDataSourceDescriptions = () => ({
     chartsGenerated: [
       'Top 10 Units by Total Requests (horizontal bar chart)',
       'Request Distribution by Unit (donut chart)',
-      'Monthly Request Trends (line chart)',
       'Total Requests count in snapshot'
     ]
   },

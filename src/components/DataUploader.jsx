@@ -418,7 +418,6 @@ const DataUploader = ({ campusCode, onDataLoaded, manualStats, onManualStatsChan
           <li><strong>Top 10 Units by Deposits</strong> - Horizontal bar chart from deposits_by_unit.csv</li>
           <li><strong>Top 10 Units by Total Requests</strong> - Horizontal bar chart from history_by_unit.csv</li>
           <li><strong>Request Distribution by Unit</strong> - Donut chart showing percentage breakdown</li>
-          <li><strong>Monthly Request Trends</strong> - Line chart over the past 24 months</li>
           <li><strong>Deposits vs Engagement by Unit</strong> - Grouped bar chart comparison</li>
           <li><strong>Downloads vs View-only by Unit</strong> - Stacked bar chart from breakdown_by_unit.csv</li>
         </ul>
