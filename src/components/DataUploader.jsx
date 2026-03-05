@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { parseAndDetectCSV } from '../utils/csvParser';
 import { getStatsUrls, getDataSourceDescriptions } from '../utils/dataFetcher';
 
@@ -19,6 +19,15 @@ const DataUploader = ({ campusCode, onDataLoaded, manualStats, onManualStatsChan
 
   const urls = getStatsUrls(campusCode);
   const dataSources = getDataSourceDescriptions();
+
+  // Clear uploaded files when campus changes
+  useEffect(() => {
+    setHistoryFile(null);
+    setDepositsFile(null);
+    setError(null);
+    setDetectionMessage(null);
+    setDownloadStep(0);
+  }, [campusCode]);
 
   // Open download modal
   const handleStartDownload = () => {
@@ -71,6 +80,20 @@ const DataUploader = ({ campusCode, onDataLoaded, manualStats, onManualStatsChan
     }
   };
 
+  // Campus name mapping for validation messages
+  const campusNames = {
+    ucb: 'UC Berkeley',
+    ucla: 'UCLA',
+    ucsd: 'UC San Diego',
+    ucd: 'UC Davis',
+    uci: 'UC Irvine',
+    ucsb: 'UC Santa Barbara',
+    ucsc: 'UC Santa Cruz',
+    ucr: 'UC Riverside',
+    ucm: 'UC Merced',
+    ucsf: 'UCSF'
+  };
+
   // Process file with auto-detection
   const processFileWithDetection = async (file, expectedField) => {
     setLoading(true);
@@ -78,11 +101,18 @@ const DataUploader = ({ campusCode, onDataLoaded, manualStats, onManualStatsChan
     setDetectionMessage(null);
 
     try {
-      const { detectedType, parsedData } = await parseAndDetectCSV(file);
+      const { detectedType, detectedCampus, parsedData } = await parseAndDetectCSV(file);
 
       // Check if the detected type matches expected
       if (detectedType === 'unknown') {
         setError(`Could not recognize CSV format. Make sure you're uploading a file from eScholarship stats.`);
+        setLoading(false);
+        return;
+      }
+
+      // Check if the detected campus matches the selected campus
+      if (detectedCampus && detectedCampus !== campusCode) {
+        setError(`Campus mismatch: This CSV appears to contain data for ${campusNames[detectedCampus] || detectedCampus}, but you have ${campusNames[campusCode] || campusCode} selected. Please select the correct campus or upload the correct CSV file.`);
         setLoading(false);
         return;
       }
@@ -385,11 +415,18 @@ const DataUploader = ({ campusCode, onDataLoaded, manualStats, onManualStatsChan
       <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
         <p className="font-medium mb-1">Charts generated from your data:</p>
         <ul className="list-disc list-inside space-y-0.5">
-          <li>Unit Performance: Top 10 units ranked by total requests</li>
-          <li>Distribution: Percentage breakdown of requests across units</li>
-          <li>Monthly Trends: Request counts over the past 24 months</li>
-          <li>Deposits vs Requests: Comparing deposits to engagement per unit</li>
+          <li><strong>Top 10 Units by Deposits</strong> - Horizontal bar chart from deposits_by_unit.csv</li>
+          <li><strong>Top 10 Units by Total Requests</strong> - Horizontal bar chart from history_by_unit.csv</li>
+          <li><strong>Request Distribution by Unit</strong> - Donut chart showing percentage breakdown</li>
+          <li><strong>Monthly Request Trends</strong> - Line chart over the past 24 months</li>
+          <li><strong>Deposits vs Engagement by Unit</strong> - Grouped bar chart comparison</li>
+          <li><strong>Downloads vs View-only by Unit</strong> - Stacked bar chart from breakdown_by_unit.csv</li>
         </ul>
+      </div>
+
+      {/* Tableau preview warning */}
+      <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+        <p><strong>Note:</strong> The Tableau dashboard embed will not display in the preview, but it will work correctly when you export and download the HTML file.</p>
       </div>
 
       {/* Download Modal */}

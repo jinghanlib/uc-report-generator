@@ -1,5 +1,43 @@
 import Papa from 'papaparse';
 
+// Campus name patterns for detection
+const campusPatterns = {
+  ucb: ['UC Berkeley', 'Berkeley'],
+  ucla: ['UCLA'],
+  ucsd: ['UC San Diego', 'UCSD'],
+  ucd: ['UC Davis', 'Davis'],
+  uci: ['UC Irvine', 'Irvine'],
+  ucsb: ['UC Santa Barbara', 'Santa Barbara', 'UCSB'],
+  ucsc: ['UC Santa Cruz', 'Santa Cruz', 'UCSC'],
+  ucr: ['UC Riverside', 'Riverside', 'UCR'],
+  ucm: ['UC Merced', 'Merced'],
+  ucsf: ['UCSF', 'San Francisco']
+};
+
+/**
+ * Detect campus code from unit names in the data
+ * @param {Array} data - Parsed CSV data
+ * @returns {string|null} Detected campus code or null
+ */
+export const detectCampusFromData = (data) => {
+  if (!data || data.length === 0) return null;
+
+  // Look through unit names for campus indicators
+  for (const row of data) {
+    const unitName = row['Unit'] || row['unit'] || '';
+
+    for (const [code, patterns] of Object.entries(campusPatterns)) {
+      for (const pattern of patterns) {
+        if (unitName.includes(pattern)) {
+          return code;
+        }
+      }
+    }
+  }
+
+  return null;
+};
+
 /**
  * Detect the type of CSV file based on headers
  * @param {Array} data - Parsed CSV data
@@ -46,13 +84,14 @@ export const parseCSV = (file) => {
 };
 
 /**
- * Parse CSV and auto-detect type
+ * Parse CSV and auto-detect type and campus
  * @param {File} file - The CSV file to parse
- * @returns {Promise<Object>} Object with data, detectedType, and parsed result
+ * @returns {Promise<Object>} Object with data, detectedType, detectedCampus, and parsed result
  */
 export const parseAndDetectCSV = async (file) => {
   const rawData = await parseCSV(file);
   const detectedType = detectCsvType(rawData);
+  const detectedCampus = detectCampusFromData(rawData);
 
   let parsedData = null;
   if (detectedType === 'history') {
@@ -66,6 +105,7 @@ export const parseAndDetectCSV = async (file) => {
   return {
     rawData,
     detectedType,
+    detectedCampus,
     parsedData
   };
 };

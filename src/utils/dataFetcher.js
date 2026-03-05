@@ -34,27 +34,27 @@ export const getDataSourceDescriptions = () => ({
     name: 'History by Unit CSV',
     description: 'Contains views and downloads data over time for each research unit.',
     chartsGenerated: [
-      'Total Requests (Views + Downloads)',
-      'Unit Performance Bar Chart (Top 10 units by requests)',
-      'Request Distribution Pie Chart',
-      'Monthly Trends Line Chart'
+      'Top 10 Units by Total Requests (horizontal bar chart)',
+      'Request Distribution by Unit (donut chart)',
+      'Monthly Request Trends (line chart)',
+      'Total Requests count in snapshot'
     ]
   },
   depositsByUnit: {
     name: 'Deposits by Unit CSV',
     description: 'Contains deposit counts over time for each research unit.',
     chartsGenerated: [
-      'Total Deposits count',
-      'Deposits vs Requests comparison chart',
-      'Data table deposit column'
+      'Top 10 Units by Deposits (horizontal bar chart)',
+      'Deposits vs Engagement by Unit (grouped bar chart)',
+      'Total Deposits count in snapshot'
     ]
   },
   breakdownByUnit: {
     name: 'Breakdown by Unit CSV',
     description: 'Contains detailed breakdown of downloads vs view-only requests.',
     chartsGenerated: [
-      'Download percentage calculations',
-      'Detailed data table with downloads and view-only columns'
+      'Downloads vs View-only by Unit (stacked bar chart)',
+      'Download percentage in data table'
     ]
   }
 });
